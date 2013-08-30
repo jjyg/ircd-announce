@@ -1,0 +1,7 @@
+dummy IRC server to announce a static message to clients.
+
+Useful when phasing out a server, changing ports, etc.
+
+Usage:
+
+$ ruby ircd-announce.rb "This server is now closed. Please use irc.foo.bar instead."
