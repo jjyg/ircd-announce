@@ -56,8 +56,8 @@ class IrcdAnnounce
 			end
 		}
 	rescue
-		puts $!, $!.backtrace
-		sleep 1
+		puts $!, $!.backtrace if $VERBOSE
+		sleep 0.1
 	end
 
 	def main_loop
@@ -68,6 +68,8 @@ class IrcdAnnounce
 	def handle_client(c)
 		l = gets(c.fd)
 		if !l
+			close_client(c)
+		elsif l.split[0].downcase == 'quit'
 			close_client(c)
 		elsif !c.user or !c.nick
 			case l.split[0].downcase
@@ -97,6 +99,7 @@ class IrcdAnnounce
 :#{IRCD_NAME} 375 #{c.nick} :- #{IRCD_NAME} message of the day
 :#{IRCD_NAME} 372 #{c.nick} :- #{@message}
 :#{IRCD_NAME} 376 #{c.nick} :End of /MOTD command
+:oper!oper@#{IRCD_NAME} PRIVMSG #{c.nick} :#{@message}
 EOS
 
 		puts Time.now.strftime("%Y-%m-%d %H:%M:%S ") + "new client #{c.nick.inspect} #{c.hostname.inspect}" if $VERBOSE
@@ -130,7 +133,7 @@ EOS
 		def initialize(fd)
 			@fd = fd
 			@creation_time = Time.now
-			@hostname = c.fd.peeraddr[3]
+			@hostname = @fd.peeraddr[3]
 		end
 	end
 end
